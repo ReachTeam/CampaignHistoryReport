@@ -40,7 +40,7 @@ class CampaignHistoryReportController extends Controller
             'year'=>$data['year'],
             'custom_property'=>'influencer_campaigns_history'
         ]);
-        return response()->json(['message'=>'Attachment Saved Successfully','report'=>$attachment->url],200);
+        return response()->json(['message'=>'Attachment Saved Successfully', 'report'=>''],200);
 
     }
 
