@@ -28,7 +28,7 @@
                     </div>
                     <div class="py-6 px-8 w-1/2">
                         <input id="report" dusk="long_url" type="file"  ref="report"  placeholder="Business Report"
-                               class="w-full form-control form-input form-input-bordered"  @change="setInfluencerReport($event)">
+                               class="w-full form-control form-input form-input-bordered"  @change="setInfluencerReport($event)" multiple>
                         <div class="help-text help-text mt-2"></div>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                 this.username= '';
             },
             setInfluencerReport($event){
-                this.report= this.$refs.report.files[0];
+                this.report= this.$refs.report.files;
             },
             postData: async function (url = '', data = {}) {
                 const headers = {
@@ -145,7 +145,13 @@
 
 
                 let formdata = new FormData();
-                formdata.append("report", this.report);
+
+                //multiple files
+              for( let i = 0; i < this.$refs.report.files.length; i++ ){
+                let file = this.$refs.report.files[i];
+                formdata.append('report[' + i + ']', file);
+              }
+
                 formdata.append("username", this.username);
                 formdata.append("month", this.month);
                 formdata.append("year", this.year);
@@ -181,7 +187,7 @@
                             result.json().then(response => {
                                 Vue.swal({
                                     title: response.message,
-                                    html: '<small>'+response.report+'</small>',
+                                   // html: '<small>'+response.report+'</small>',
                                     confirmButtonText: 'Ok',
                                     confirmButtonColor: '#91c18e'
                                 }).then(()=>{self.disabled=false;self.resetForm()})
