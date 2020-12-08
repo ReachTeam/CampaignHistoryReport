@@ -27,27 +27,40 @@ class CampaignHistoryReportController extends Controller
      */
     public function sendReport(Request $request)
     {
-        $data= $this->validate($request, ['username'=>'required|exists:users,username','month'=>'required|numeric|max:12','year'=>'required|numeric','report'=>'required|file|mimes:pdf|max:10240']);
+        $data= $this->validate($request, ['username'=>'required|exists:users,username','month'=>'required|numeric|max:12','year'=>'required|numeric',
+            'report.*'=>'required|file|mimes:pdf|max:10240'
+        ],[
+                'report.*.required' => 'The report is required',
+                'report.*.mimes' => 'Only pdf are allowed',
+                'report.*.max' => 'Sorry! Maximum allowed size for an report is 10MB',
+            ]
+        );
         $user= User::where('username',$data['username'])->first();
         if(!$user)
             return response()->json(['message'=>'This user is not found or seems to be deleted'],400);
 
-        $url= $this->uploadInfluencerRequestToS3($request,$user);
-        $attachment= $user->attachments()->create([
-            'url'=>$url,
-            'username'=>$data['username'],
-            'month'=>$data['month'],
-            'year'=>$data['year'],
-            'custom_property'=>'influencer_campaigns_history'
-        ]);
-        return response()->json(['message'=>'Attachment Saved Successfully', 'report'=>''],200);
+        foreach ($request->file('report') as $singleFile){
+
+            $url= $this->uploadInfluencerRequestToS3($singleFile,$user,$request->month,$request->month);
+            $attachment= $user->attachments()->create([
+                'url'=>$url,
+                'username'=>$data['username'],
+                'month'=>$data['month'],
+                'year'=>$data['year'],
+                'custom_property'=>'influencer_campaigns_history'
+            ]);
+
+        }
+
+
+        return response()->json(['message'=>'Attachment Saved Successfully'],200);
 
     }
 
-    private function uploadInfluencerRequestToS3(Request $request, User $user){
-        $file = $request->file('report');
-        $name=$file->getClientOriginalName();
-        $filePath = 'attachable/campaigns_history/' .$user->id.'/'. $user->username.'-'.$request->month.'-'.$request->year??Carbon::now()->year.$file->getClientOriginalExtension();
+    private function uploadInfluencerRequestToS3($file, User $user,$month,$year){
+        // $file = $request->file('report');
+        $fileName = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
+        $filePath = 'attachable/campaigns_history/' .$fileName.'/' .$user->id.'/'. $user->username.'-'.$month.'-'.$year??Carbon::now()->year.$file->getClientOriginalExtension();
         Storage::disk('s3')->put($filePath, file_get_contents($file), 'public');
 //        $user->addMediaFromRequest('report')->toMediaCollection('monthly_report_attachments','s3-plus');
         return $filePath;
