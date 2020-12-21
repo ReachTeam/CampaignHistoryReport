@@ -41,7 +41,7 @@ class CampaignHistoryReportController extends Controller
 
         foreach ($request->file('report') as $singleFile){
 
-            $url= $this->uploadInfluencerRequestToS3($singleFile,$user,$request->month,$request->month);
+            $url= $this->uploadInfluencerRequestToS3($singleFile,$user,$request->month,$request->year);
             $attachment= $user->attachments()->create([
                 'url'=>$url,
                 'username'=>$data['username'],
