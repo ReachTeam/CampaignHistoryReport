@@ -59,10 +59,10 @@ class CampaignHistoryReportController extends Controller
 
     private function uploadInfluencerRequestToS3($file, User $user,$month,$year){
         // $file = $request->file('report');
-        $fileName = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
-        $filePath = 'attachable/campaigns_history/' .$fileName.'/' .$user->id.'/'. $user->username.'-'.$month.'-'.$year??Carbon::now()->year.$file->getClientOriginalExtension();
+        //$fileName = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
+        $filePath = 'attachable/campaigns_history/' .uniqid().'/' .$user->id.'/'. $user->username.'-'.$month.'-'.$year??Carbon::now()->year.$file->getClientOriginalExtension();
         Storage::disk('s3')->put($filePath, file_get_contents($file), 'public');
-//        $user->addMediaFromRequest('report')->toMediaCollection('monthly_report_attachments','s3-plus');
+        //$user->addMediaFromRequest('report')->toMediaCollection('monthly_report_attachments','s3-plus');
         return $filePath;
     }
 
