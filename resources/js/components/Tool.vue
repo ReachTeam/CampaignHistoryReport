@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="py-6 px-8 w-1/2">
-                        <select id="month" dusk="title"  placeholder="Month"
+                        <select id="year" dusk="title"  placeholder="Month"
                                 class="w-full form-control form-input form-input-bordered" v-model="year">
                             <option v-for="y in current_year"  >{{y}}</option>
                         </select>
