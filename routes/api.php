@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/save-campaign-report', '\History\CampaignHistoryReport\Http\Controllers\CampaignHistoryReportController@sendReport');
-//Route::get('/business_usernames', '\Influencer\MonthlyReport\Http\Controllers\CampaignHistoryReportController.php@getBusinessUserNames');
+Route::get('/getBusiness_usernames', '\History\CampaignHistoryReport\Http\Controllers\CampaignHistoryReportController@getBusinessUserNames');
 
 
 // Route::get('/endpoint', function (Request $request) {
