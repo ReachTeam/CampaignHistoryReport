@@ -105,7 +105,7 @@
         },
         methods:{
             usernameSearchAPI(username) {
-                let apiUrl= window.location.origin+`/nova-vendor/monthly-report/business_usernames?username=${username}`
+                let apiUrl= window.location.origin+`/nova-vendor/campaign-history-report/getBusiness_usernames?username=${username}`
                 axios.get(apiUrl).then(({data: {usernames}}) => {
                     this.results = usernames;
                 })
