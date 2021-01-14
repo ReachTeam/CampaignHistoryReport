@@ -85,13 +85,9 @@ class CampaignHistoryReportController extends Controller
     }
 
 
-    private function isValidDate($data)
+    public function isValidDate($data)
     {
-        return checkdate(
-            (int)$data['month'],
-            (int)$data['day'],
-            (int)$data['year'],
-        );
+        return checkdate($data['month'], $data['day'], $data['year']);
     }
 }
 
