@@ -7,6 +7,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Validator;
 
 class CampaignHistoryReportController extends Controller
 {
@@ -27,7 +28,10 @@ class CampaignHistoryReportController extends Controller
      */
     public function sendReport(Request $request)
     {
-        $data= $this->validate($request, ['username'=>'required|exists:users,username','month'=>'required|numeric|max:12','year'=>'required|numeric',
+        $data= $this->validate($request, ['username'=>'required|exists:users,username',
+            'day'=>'required|numeric|max:31',
+            'month'=>'required|numeric|max:12',
+            'year'=>'required|numeric',
             'report.*'=>'required|file|mimes:pdf|max:10240'
         ],[
                 'report.*.required' => 'The report is required',
@@ -35,16 +39,22 @@ class CampaignHistoryReportController extends Controller
                 'report.*.max' => 'Sorry! Maximum allowed size for an report is 10MB',
             ]
         );
+
+        if(!$this->isValidDate($data))
+            //return response()->json(['message'=>'Invalid date'],422);
+            return response()->json(['message'=>'Invalid date'],422);
+
         $user= User::where('username',$data['username'])->first();
         if(!$user)
             return response()->json(['message'=>'This user is not found or seems to be deleted'],400);
 
         foreach ($request->file('report') as $singleFile){
 
-            $url= $this->uploadInfluencerRequestToS3($singleFile,$user,$request->month,$request->year);
+            $url= $this->uploadInfluencerRequestToS3($singleFile,$user,$request->day,$request->month,$request->year);
             $attachment= $user->attachments()->create([
                 'url'=>$url,
                 'username'=>$data['username'],
+                'day'=>$data['day'],
                 'month'=>$data['month'],
                 'year'=>$data['year'],
                 'custom_property'=>'influencer_campaigns_history'
@@ -57,10 +67,10 @@ class CampaignHistoryReportController extends Controller
 
     }
 
-    private function uploadInfluencerRequestToS3($file, User $user,$month,$year){
+    private function uploadInfluencerRequestToS3($file, User $user,$day,$month,$year){
         // $file = $request->file('report');
         //$fileName = pathinfo( $file->getClientOriginalName(), PATHINFO_FILENAME);
-        $filePath = 'attachable/campaigns_history/' .uniqid().'/' .$user->id.'/'. $user->username.'-'.$month.'-'.$year??Carbon::now()->year.$file->getClientOriginalExtension();
+        $filePath = 'attachable/campaigns_history/' .uniqid().'/' .$user->id.'/'. $user->username.'-'.$day.'-'.$month.'-'.$year??Carbon::now()->year.$file->getClientOriginalExtension();
         Storage::disk('s3')->put($filePath, file_get_contents($file), 'public');
         //$user->addMediaFromRequest('report')->toMediaCollection('monthly_report_attachments','s3-plus');
         return $filePath;
@@ -72,6 +82,16 @@ class CampaignHistoryReportController extends Controller
             return response()->json(['usernames'=>[]]);
         $userNames= User::where('username','like',"%".$request->username.'%')->take(20)->select(['id','username'])->get();
         return response()->json(['usernames'=>$userNames]);
+    }
+
+
+    private function isValidDate($data)
+    {
+        return checkdate(
+            (int)$data['month'],
+            (int)$data['day'],
+            (int)$data['year'],
+        );
     }
 }
 

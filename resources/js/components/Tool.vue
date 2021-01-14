@@ -34,6 +34,22 @@
                 </div>
 
                 <div class="flex border-b border-40">
+
+
+                  <div class="w-1/5 py-6 px-8">
+                    <label for="Day" class="inline-block text-80 pt-2 leading-tight">
+                      Day
+                    </label>
+                  </div>
+                  <div class="py-6 px-8 w-1/2">
+                    <select id="day" dusk="title"  placeholder="Day"
+                            class="w-full form-control form-input form-input-bordered" v-model="day">
+                      <option v-for="d in 31"  >{{d}}</option>
+                    </select>
+                    <div class="help-text help-text mt-2"></div>
+                  </div>
+
+
                     <div class="w-1/5 py-6 px-8">
                         <label for="Month" class="inline-block text-80 pt-2 leading-tight">
                             Month
@@ -48,7 +64,7 @@
                     </div>
 
                     <div class="py-6 px-8 w-1/2">
-                        <select id="year" dusk="title"  placeholder="Month"
+                        <select id="year" dusk="title"  placeholder="Year"
                                 class="w-full form-control form-input form-input-bordered" v-model="year">
                             <option v-for="y in current_year"  >{{y}}</option>
                         </select>
@@ -88,6 +104,7 @@
         data() {
             return {
                 username: '',
+                day: new Date().getDay(),
                 month: new Date().getMonth(),
                 year: new Date().getFullYear(),
                 current_year: new Date().getFullYear(),
@@ -118,6 +135,7 @@
             resetForm(){
                 this.report= '';
                 this.month= new Date().getMonth();
+                this.day= new Date().getDay();
                 this.username= '';
             },
             setInfluencerReport($event){
@@ -153,6 +171,7 @@
               }
 
                 formdata.append("username", this.username);
+                formdata.append("day", this.day);
                 formdata.append("month", this.month);
                 formdata.append("year", this.year);
 
