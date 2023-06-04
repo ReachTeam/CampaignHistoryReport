@@ -72,12 +72,14 @@
                     </div>
                 </div>
 
-                <div class="flex items-center">
+                <div class="flex items-center" style="flex-direction: row-reverse">
                     <button class="btn btn-default btn-primary inline-flex items-center relative"
+                            style="margin: 20px; padding: 10px; color: white; background-color: #38bdf8; border-radius: 4px"
                             @click="saveInfluencerReport($event)" dusk="create-button" :disabled="disabled">
-                        <span class=""> Save Report</span>
+                      <span class=""> Save Report</span>
                     </button>
                 </div>
+
             </form>
 
             <div v-show="isLoading" class="loading w-full block text-center">
@@ -89,13 +91,12 @@
 </template>
 
 <script>
+
     import axios from "axios";
-    import Vue from "vue";
-    import VueSweetalert2 from 'vue-sweetalert2';
+    import Swal from 'sweetalert2'
     import Loading from './Loading'
     import 'sweetalert2/dist/sweetalert2.min.css';
 
-    Vue.use(VueSweetalert2);
     export default {
         name: 'Tools',
         components: {
@@ -194,21 +195,22 @@
                                     htmlErrors+= '<li>'+errors[err][0]+'</li>'
                                 }
                                 htmlErrors += "</ul>"
-                                Vue.swal( {
-                                    icon:'error',
-                                    title:response.message,
-                                    html: htmlErrors
+
+                                Swal.fire({
+                                  icon:'error',
+                                  title:response.message,
+                                  html: htmlErrors
                                 }).then(()=>self.disabled=false)
                             })
 
                         }else{
                             this.isLoading = false;
                             result.json().then(response => {
-                                Vue.swal({
-                                    title: response.message,
-                                   // html: '<small>'+response.report+'</small>',
-                                    confirmButtonText: 'Ok',
-                                    confirmButtonColor: '#91c18e'
+
+                                Swal.fire({
+                                  title: response.message,
+                                  confirmButtonText: 'Ok',
+                                  confirmButtonColor: '#91c18e'
                                 }).then(()=>{self.disabled=false;self.resetForm()})
                             });
                         }
