@@ -7,6 +7,7 @@ use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use History\CampaignHistoryReport\Http\Middleware\Authorize;
+use Laravel\Nova\Http\Middleware\Authenticate;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -38,6 +39,9 @@ class ToolServiceProvider extends ServiceProvider
         if ($this->app->routesAreCached()) {
             return;
         }
+
+        Nova::router(['nova', Authenticate::class, Authorize::class], 'campaign-history-report')
+            ->group(__DIR__.'/../routes/inertia.php');
 
         Route::middleware(['nova', Authorize::class])
                 ->prefix('nova-vendor/campaign-history-report')
