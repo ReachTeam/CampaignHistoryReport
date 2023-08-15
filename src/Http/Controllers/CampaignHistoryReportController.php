@@ -55,7 +55,6 @@ class CampaignHistoryReportController extends Controller
 
             $attachment = new Attachment();
 
-            $attachment->setConnection('plus');
 
             $attachment->create([
                 'attachable_type' => 'App\Models\User',
